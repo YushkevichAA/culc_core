@@ -16,7 +16,7 @@ export type TokenType =
   | "variable"
   | "unknown";
 
-export interface IFunction {
+export interface IFunctions {
   [key: string]: {
     args: number;
     evaluate: (...args: number[]) => number;
@@ -26,6 +26,10 @@ export interface IFunction {
 export interface IConstants {
   [key: string]: number;
 }
+
+export interface IVariables extends IConstants {}
+
+export interface IMathOperators extends IFunctions {}
 
 export interface IOperator {
   precedence: number;

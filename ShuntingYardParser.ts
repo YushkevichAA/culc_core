@@ -1,18 +1,12 @@
-import {
-  IPriorityOperatorsList,
-  IOperator,
-  IToken,
-  TokenType,
-  IFunction,
-} from "./types";
+import { IPriorityOperatorsList, IOperator, IToken, IFunctions } from "./types";
 
 type TExpect = "operator" | "operand" | "(";
 
 export class ShuntingYardParser {
   operators: IPriorityOperatorsList;
-  functions: IFunction;
+  functions: IFunctions;
 
-  constructor(functions: IFunction) {
+  constructor(functions: IFunctions) {
     this.functions = functions;
     this.operators = {
       "+": { precedence: 1, associative: "left" },
@@ -46,7 +40,7 @@ export class ShuntingYardParser {
       } else if (
         token.type === "operator" &&
         token.value === "-" &&
-        this.isUnary(token)
+        this.isUnary(prev)
       ) {
         expect = this.parseUnary(token, stack, expect);
       } else if (token.type === "operator") {
@@ -118,7 +112,7 @@ export class ShuntingYardParser {
       );
     }
     stack.push(token);
-    argsCount.push[1];
+    argsCount.push(1);
     return "(";
   }
 
@@ -231,25 +225,27 @@ export class ShuntingYardParser {
         `"(" missing before "${token.value}" (${token.start}:${token.end})`,
       );
     }
-    const funcInStack = stack.pop();
+    stack.pop();
+
     if (stack.length && stack[stack.length - 1].type === "function") {
-      const func = this.functions[stack[stack.length - 1].value];
+      const lastTokenFunction = stack[stack.length - 1];
+      const func = this.functions[lastTokenFunction.value];
       if (!func) {
         throw new Error(
-          `No such function {${stack[stack.length - 1].value}} in function list`,
+          `No such function {${lastTokenFunction.value}} in function list`,
         );
       }
       const args = argsCount.pop();
       if (func.args !== args) {
         throw new Error(
-          `invalid ${funcInStack.value} arguments count:  expected ${func.args}, got ${args} "${token.value} ${token.start}:${token.end}"`,
+          `invalid ${lastTokenFunction.value} arguments count:  expected ${func.args}, got ${args} "${token.value} ${token.start}:${token.end}"`,
         );
       }
 
       rpn.push(stack.pop() as IToken);
     }
 
-    return "operand";
+    return "operator";
   }
 
   parseLastOperators(stack: IToken[], rpn: IToken[], expect: TExpect) {

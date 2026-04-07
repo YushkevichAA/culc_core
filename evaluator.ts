@@ -1,31 +1,25 @@
-import { IFunction, IConstants, IToken } from "./types";
+import { IFunctions, IConstants, IToken, IVariables } from "./types";
 
 export class ExpressionEvaluator {
-  functions: IFunction;
+  functions: IFunctions;
   constants: IConstants;
-  operators: IFunction;
+  operators: IFunctions;
 
   constructor({
     functions,
     constants,
     operators,
   }: {
-    functions: IFunction;
+    functions: IFunctions;
     constants: IConstants;
-    operators: IFunction;
+    operators: IFunctions;
   }) {
     this.functions = functions;
     this.constants = constants;
     this.operators = operators;
   }
 
-  evaluate({
-    rpn,
-    variables,
-  }: {
-    rpn: IToken[];
-    variables: { [keyof: string]: number };
-  }) {
+  evaluate({ rpn, variables }: { rpn: IToken[]; variables: IVariables }) {
     const stack: number[] = [];
 
     for (const token of rpn) {
